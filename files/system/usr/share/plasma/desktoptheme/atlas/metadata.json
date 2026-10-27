@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Category": "",
+        "Description": "Материалы дизайн-системы «Атлас»",
+        "Description[en]": "Atlas design system materials",
+        "EnabledByDefault": true,
+        "Id": "atlas",
+        "License": "LGPL-2.1-or-later",
+        "Name": "Атлас",
+        "Name[en]": "Atlas",
+        "Version": "1"
+    },
+    "X-Plasma-API": "5.0"
+}

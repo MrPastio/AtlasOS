@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Category": "",
+        "Description": "Материалы дизайн-системы «Атлас»",
+        "Description[en]": "Atlas design system materials",
+        "EnabledByDefault": true,
+        "Id": "atlas-dark",
+        "License": "LGPL-2.1-or-later",
+        "Name": "Атлас тёмная",
+        "Name[en]": "Atlas Dark",
+        "Version": "1"
+    },
+    "X-Plasma-API": "5.0"
+}

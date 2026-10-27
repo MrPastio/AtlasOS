@@ -8,7 +8,7 @@ ColorScheme=AtlasLight
 Theme=breeze
 
 [plasmarc][Theme]
-name=default
+name=atlas
 
 [kcminputrc][Mouse]
 cursorTheme=breeze_cursors
