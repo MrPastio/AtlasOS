@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+# Общие модули для ВСЕХ вариантов AtlasOS (AMD/Intel и NVIDIA).
+# Всё, что меняет систему, добавляем сюда, а не в recipe-*.yml.
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: / # files/system/* -> корень образа
+
+  - type: signing # подпись образа, чтобы обновления проверялись ключом
