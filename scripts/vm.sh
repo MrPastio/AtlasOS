@@ -54,7 +54,13 @@ case "${1:-}" in
   main)    rebase_to latest ;;
   upgrade) vm_ssh 'sudo -n rpm-ostree upgrade'; reboot_vm ;;
   reboot)  reboot_vm ;;
-  start)   "$VBM" startvm "$VM" --type gui; wait_ssh ;;
+  start)
+    # сразу после выключения ВМ ещё несколько секунд заблокирована сессией
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+      "$VBM" startvm "$VM" --type gui 2>/dev/null && break
+      sleep 3
+    done
+    wait_ssh ;;
   stop)    vm_ssh 'sudo -n systemctl poweroff' || true ;;
   reset)
     "$VBM" controlvm "$VM" poweroff 2>/dev/null || true
