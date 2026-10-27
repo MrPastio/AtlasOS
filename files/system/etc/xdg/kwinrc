@@ -1,0 +1,17 @@
+# Настройки KWin по умолчанию по дизайн-системе «Атлас» (03-materials.md, 06-motion.md).
+[Plugins]
+blurEnabled=true
+
+[Effect-blur]
+# 1–15; ориентир дизайн-системы — 9–12 (blur-lg/blur-xl)
+BlurStrength=10
+# шум против бандинга на градиентных обоях (0–2)
+NoiseStrength=1
+# backdrop-saturate 180% (в KWin — проценты, по умолчанию 150)
+Saturation=180
+
+[Effect-scale]
+# открытие/закрытие окна: dur-long 320 мс; закрытие 1 → 0.96
+Duration=320
+InScale=0.96
+OutScale=0.96
