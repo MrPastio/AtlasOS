@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# AtlasOS для AMD / Intel видеокарт (и для виртуалки).
+# Образ публикуется как ghcr.io/<владелец>/atlasos
+name: atlasos # рабочее имя, финальное название выберем на этапе 5
+description: "AtlasOS — macOS-like desktop on Bazzite KDE"
+
+base-image: ghcr.io/ublue-os/bazzite # Bazzite KDE (Plasma 6)
+image-version: stable
+
+modules:
+  - from-file: common.yml
