@@ -7,4 +7,10 @@ modules:
       - source: system
         destination: / # files/system/* -> корень образа
 
+  # Моноширинный шрифт «Атласа». Onest (интерфейс) лежит файлом в files/system/usr/share/fonts.
+  - type: dnf
+    install:
+      packages:
+        - jetbrains-mono-fonts-all
+
   - type: signing # подпись образа, чтобы обновления проверялись ключом

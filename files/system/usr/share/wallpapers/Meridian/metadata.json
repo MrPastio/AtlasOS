@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "Wallpaper/Images",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Id": "Meridian",
+        "License": "CC-BY-SA-4.0",
+        "Name": "Меридиан",
+        "Name[en]": "Meridian"
+    }
+}
