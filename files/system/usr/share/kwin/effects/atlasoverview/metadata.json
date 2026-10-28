@@ -1,0 +1,20 @@
+{
+    "KPackageStructure": "KWin/Effect",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Category": "Window Management",
+        "Description": "Обзор «Атласа»: все окна стола без перекрытий, столы лентой сверху; ❖ Tab, горячий угол слева сверху, три пальца вверх",
+        "Description[en]": "Atlas Overview: all windows without overlap, desktops as a strip on top; Meta+Tab, top-left hot corner, three-finger swipe up",
+        "EnabledByDefault": true,
+        "Id": "atlasoverview",
+        "License": "GPL",
+        "Name": "Обзор «Атласа»",
+        "Name[en]": "Atlas Overview"
+    },
+    "X-KDE-Ordering": 60,
+    "X-Plasma-API": "declarativescript"
+}
