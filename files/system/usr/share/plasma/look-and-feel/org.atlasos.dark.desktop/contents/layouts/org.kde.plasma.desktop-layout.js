@@ -21,7 +21,38 @@ bar.addWidget("org.atlasos.compass");
 bar.addWidget("org.atlasos.appname");
 bar.addWidget("org.kde.plasma.appmenu");
 bar.addWidget("org.kde.plasma.panelspacer");
-bar.addWidget("org.kde.plasma.systemtray");
+
+// Лоток — только значки фоновых приложений и редкие системные; сеть, звук, батарею,
+// Bluetooth, яркость, музыку и телефон показывает Пульт. knownItems перечисляет и убранные,
+// иначе лоток вернёт их как новые.
+// В Plasma 6.7 лоток сам хранит список ([Applets][N][General]), отдельного контейнера нет.
+var trayItems = bar.addWidget("org.kde.plasma.systemtray");
+trayItems.currentConfigGroup = ["General"];
+trayItems.writeConfig("extraItems", [
+    "org.kde.plasma.notifications",
+    "org.kde.plasma.keyboardlayout",
+    "org.kde.plasma.keyboardindicator",
+    "org.kde.plasma.devicenotifier",
+    "org.kde.plasma.manage-inputmethod",
+    "org.kde.plasma.cameraindicator",
+    "org.kde.plasma.printmanager",
+    "org.kde.plasma.clipboard",
+    "org.kde.plasma.vault",
+    "org.kde.kscreen"
+]);
+trayItems.writeConfig("hiddenItems", ["org.kde.plasma.clipboard", "org.kde.plasma.vault", "org.kde.kscreen", "org.kde.plasma.printmanager"]);
+trayItems.writeConfig("knownItems", [
+    "org.kde.kdeconnect", "org.kde.plasma.vault", "org.kde.kscreen", "org.kde.plasma.battery",
+    "org.kde.plasma.bluetooth", "org.kde.plasma.brightness", "org.kde.plasma.cameraindicator",
+    "org.kde.plasma.clipboard", "org.kde.plasma.devicenotifier", "org.kde.plasma.keyboardindicator",
+    "org.kde.plasma.keyboardlayout", "org.kde.plasma.manage-inputmethod", "org.kde.plasma.mediacontroller",
+    "org.kde.plasma.networkmanagement", "org.kde.plasma.notifications", "org.kde.plasma.printmanager",
+    "org.kde.plasma.volume", "org.kde.plasma.weather"
+]);
+
+// Пилюля статуса открывает Пульт; ❖ A — тоже
+var pult = bar.addWidget("org.atlasos.pult");
+pult.globalShortcut = "Meta+A";
 
 // «Вт 27 окт. 22:41» стилем control: Onest 13px/500
 var clock = bar.addWidget("org.kde.plasma.digitalclock");

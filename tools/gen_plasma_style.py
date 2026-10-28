@@ -20,7 +20,7 @@ FRAMES = {
     'dialogs/background': ('material-popover', 'bg-elevated', 'radius-md', (6, 6, 6, 6), 'shadow-popover'),
     'widgets/tooltip': ('material-popover', 'bg-elevated', 'radius-md', (6, 6, 6, 6), 'shadow-popover'),
     # Подложка панели одна на все панели. Док — полупрозрачная панель (translucent/), верхняя
-    # строка — «непрозрачная» (Plasma берёт solid/): туда кладётся material-menubar, см. SOLID_TINT.
+    # строка — «непрозрачная» (Plasma берёт solid/): туда кладётся material-menubar, см. SOLID_FRAMES.
     # Радиус 14, а не radius-xl 18: Plasma не даёт панели быть тоньше суммы верхнего и нижнего
     # углов подложки (даже отключённых), а строке меню нужно 28px.
     # Поля апплетов Plasma считает как отступ подложки + smallSpacing (4), не больше
@@ -28,8 +28,14 @@ FRAMES = {
     # строка 28px: везде 3, пункт меню 22px.
     'widgets/panel-background': ('material-dock', 'bg-window', 14, (2, 0, 3, 3), 'shadow-dock'),
 }
-# рамка -> материал варианта translucent/solid/ (непрозрачная панель при включённом размытии)
-SOLID_TINT = {'widgets/panel-background': 'material-menubar'}
+# Варианты solid/ и translucent/solid/ со своим описанием (как в FRAMES). Plasma берёт их для
+# «непрозрачных» панелей и окон Dialog с SolidBackground; при включённом размытии — translucent/solid/.
+SOLID_FRAMES = {
+    # верхняя строка: material-menubar вместо material-dock
+    'widgets/panel-background': ('material-menubar', 'bg-window', 14, (2, 0, 3, 3), 'shadow-dock'),
+    # Пульт и другие слои оболочки (01-shell.md): material-panel, radius-xl, плитки на отступе 8
+    'dialogs/background': ('material-panel', 'bg-elevated', 'radius-xl', (8, 8, 8, 8), 'shadow-popover'),
+}
 
 # Док: значок под ним зазор и индикатор высотой 3. Штатная панель задач округляет значок до
 # стандартного 48 (52 из size-dock-icon недостижимо) и делает задачу квадратной: TASK_W = толщине Дока.
@@ -380,7 +386,8 @@ def main(tokens, out):
     for th, (tid, name, name_en) in THEMES.items():
         root = os.path.join(out, tid)
         rim, edge = color(colors, 'material-rim', th), color(colors, 'material-edge', th)
-        for frame, (mat, opaque, rad, margin, sh) in FRAMES.items():
+        def render(spec):
+            mat, opaque, rad, margin, sh = spec
             R = radius[rad] if isinstance(rad, str) else rad
             R = int(R) if R == int(R) else R
             sv = shadows[sh][th] if isinstance(shadows[sh], dict) else shadows[sh]
@@ -389,13 +396,18 @@ def main(tokens, out):
             img = shadow_raster(layers, R, S)
             tint, ta = rgba(color(colors, mat, th))
             solid, _ = rgba(color(colors, opaque, th))
-            write(os.path.join(root, 'translucent', frame + '.svg'), frame_svg(tint, ta, rim, edge, R, margin, img, S))
-            if frame in SOLID_TINT:
-                st, sa = rgba(color(colors, SOLID_TINT[frame], th))
-                write(os.path.join(root, 'translucent', 'solid', frame + '.svg'),
-                      frame_svg(st, sa, rim, edge, R, margin, img, S))
-            for variant in ('opaque', 'solid', ''):
-                write(os.path.join(root, variant, frame + '.svg'), frame_svg(solid, 1.0, rim, edge, R, margin, img, S))
+            return (frame_svg(tint, ta, rim, edge, R, margin, img, S),
+                    frame_svg(solid, 1.0, rim, edge, R, margin, img, S))
+
+        for frame, spec in FRAMES.items():
+            translucent, opaque = render(spec)
+            solid_translucent, solid_opaque = render(SOLID_FRAMES[frame]) if frame in SOLID_FRAMES else (None, opaque)
+            write(os.path.join(root, 'translucent', frame + '.svg'), translucent)
+            if solid_translucent:
+                write(os.path.join(root, 'translucent', 'solid', frame + '.svg'), solid_translucent)
+            write(os.path.join(root, 'solid', frame + '.svg'), solid_opaque)
+            for variant in ('opaque', ''):
+                write(os.path.join(root, variant, frame + '.svg'), opaque)
         write(os.path.join(root, 'widgets', 'tasks.svg'), tasks_svg(colors, th))
         write(os.path.join(root, 'widgets', 'menubaritem.svg'), menubaritem_svg(colors, th))
         write(os.path.join(root, 'metadata.json'), json.dumps({
