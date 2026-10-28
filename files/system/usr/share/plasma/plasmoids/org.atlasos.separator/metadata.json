@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "AtlasOS" }],
+        "Category": "Windows and Tasks",
+        "Description": "Разделитель Дока «Атласа»: тонкая линия line-strong",
+        "Description[en]": "Atlas Dock separator line",
+        "Icon": "distribute-horizontal-x",
+        "Id": "org.atlasos.separator",
+        "License": "GPL-2.0-or-later",
+        "Name": "Разделитель Дока",
+        "Name[en]": "Dock Separator",
+        "Version": "1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
