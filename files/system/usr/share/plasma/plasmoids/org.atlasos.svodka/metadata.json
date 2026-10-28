@@ -1,0 +1,20 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Category": "Date and Time",
+        "Description": "Часы строки меню, уведомления и виджеты «Атласа»",
+        "Description[en]": "Atlas menu bar clock, notifications and widgets",
+        "Icon": "preferences-desktop-notification-bell",
+        "Id": "org.atlasos.svodka",
+        "License": "GPL-2.0-or-later",
+        "Name": "Сводка",
+        "Name[en]": "Summary",
+        "Version": "1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -25,13 +25,12 @@ bar.addWidget("org.kde.plasma.appmenu");
 bar.addWidget("org.kde.plasma.panelspacer");
 
 // Лоток — только значки фоновых приложений и редкие системные; сеть, звук, батарею,
-// Bluetooth, яркость, музыку и телефон показывает Пульт. knownItems перечисляет и убранные,
+// Bluetooth, яркость, музыку и телефон показывает Пульт, уведомления — Сводка. knownItems перечисляет и убранные,
 // иначе лоток вернёт их как новые.
 // В Plasma 6.7 лоток сам хранит список ([Applets][N][General]), отдельного контейнера нет.
 var trayItems = bar.addWidget("org.kde.plasma.systemtray");
 trayItems.currentConfigGroup = ["General"];
 trayItems.writeConfig("extraItems", [
-    "org.kde.plasma.notifications",
     "org.kde.plasma.keyboardlayout",
     "org.kde.plasma.keyboardindicator",
     "org.kde.plasma.devicenotifier",
@@ -56,18 +55,10 @@ trayItems.writeConfig("knownItems", [
 var pult = bar.addWidget("org.atlasos.pult");
 pult.globalShortcut = "Meta+A";
 
-// «Вт 27 окт. 22:41» стилем control: Onest 13px/500
-var clock = bar.addWidget("org.kde.plasma.digitalclock");
-clock.currentConfigGroup = ["Appearance"];
-clock.writeConfig("showDate", true);
-clock.writeConfig("dateFormat", "custom");
-clock.writeConfig("customDateFormat", "ddd d MMM");
-clock.writeConfig("dateDisplayFormat", 1); // рядом со временем
-clock.writeConfig("use24hFormat", 2);
-clock.writeConfig("autoFontAndSize", false);
-clock.writeConfig("fontFamily", "Onest");
-clock.writeConfig("fontWeight", 500);
-clock.writeConfig("fontSize", 10);
+// Сводка: часы «Вт 27 окт. 22:41», щелчок или ❖ N — уведомления и календарь.
+// Она же сервер уведомлений и баннеры, поэтому штатного апплета уведомлений в лотке нет.
+var svodka = bar.addWidget("org.atlasos.svodka");
+svodka.globalShortcut = "Meta+N";
 
 // Док: снизу по центру по ширине содержимого, парит и уступает окнам.
 // Толщина 63 = отступ 6 + значок 48 + 9 под индикатор. Панель задач округляет значок до 48
