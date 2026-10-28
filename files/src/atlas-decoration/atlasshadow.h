@@ -24,5 +24,9 @@ struct BoxShadow {
 // сам прямоугольник: сквозь полупрозрачное окно тень не видна. padding — насколько
 // тень выходит за край окна; окно занимает в картинке rect() - padding.
 QImage renderBoxShadow(const QList<BoxShadow> &layers, qreal radius, QMarginsF *padding);
+// То же для прямоугольника заданного размера (попап раскладок), без растяжки KWin.
+QImage renderBoxShadow(const QList<BoxShadow> &layers, qreal radius, const QSize &box, QMarginsF *padding);
+// Переход box-shadow: слои попарно, t = 0 → from, t = 1 → to.
+QList<BoxShadow> mixShadows(const QList<BoxShadow> &from, const QList<BoxShadow> &to, qreal t);
 
 } // namespace Atlas

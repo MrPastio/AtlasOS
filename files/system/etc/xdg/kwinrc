@@ -22,3 +22,5 @@ library=org.atlasos.decoration
 theme=Атлас
 ButtonsOnLeft=XIA
 ButtonsOnRight=
+# без подсказок у кнопок: задержка на зелёной открывает раскладки, подсказка легла бы на них
+ShowToolTips=false

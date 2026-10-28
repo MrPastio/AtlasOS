@@ -94,6 +94,24 @@ std::vector<float> roundedRectMask(const QSize &size, const QRectF &rect, qreal 
 
 QImage renderBoxShadow(const QList<BoxShadow> &layers, qreal radius, QMarginsF *padding)
 {
+    return renderBoxShadow(layers, radius, QSize(), padding);
+}
+
+QList<BoxShadow> mixShadows(const QList<BoxShadow> &from, const QList<BoxShadow> &to, qreal t)
+{
+    QList<BoxShadow> out;
+    for (int i = 0; i < std::min(from.size(), to.size()); ++i) {
+        const BoxShadow &a = from[i];
+        const BoxShadow &b = to[i];
+        QColor c = b.color;
+        c.setAlphaF(a.color.alphaF() + (b.color.alphaF() - a.color.alphaF()) * t);
+        out.append({a.dy + (b.dy - a.dy) * t, a.blur + (b.blur - a.blur) * t, a.spread + (b.spread - a.spread) * t, c});
+    }
+    return out;
+}
+
+QImage renderBoxShadow(const QList<BoxShadow> &layers, qreal radius, const QSize &boxSize, QMarginsF *padding)
+{
     // Тень гаусса заметна до 3 sigma = 1.5 blur.
     qreal extent = 0;
     qreal top = 0;
@@ -112,8 +130,9 @@ QImage renderBoxShadow(const QList<BoxShadow> &layers, qreal radius, QMarginsF *
     // Окно в картинке — квадрат, у которого углы тени сформированы полностью:
     // KWin растягивает только центральную строку и столбец.
     const int box = 2 * int(std::ceil(radius + extent + maxDy)) + 1;
-    const QSize size(box + 2 * side, box + padTop + padBottom);
-    const QRectF boxRect(side, padTop, box, box);
+    const QSize inner = boxSize.isValid() ? boxSize : QSize(box, box);
+    const QSize size(inner.width() + 2 * side, inner.height() + padTop + padBottom);
+    const QRectF boxRect(QPointF(side, padTop), inner);
     const int w = size.width();
     const int h = size.height();
 

@@ -8,6 +8,8 @@
 #include <KDecoration3/DecorationButton>
 
 #include <QColor>
+#include <QPointer>
+#include <QTimer>
 #include <QVariantAnimation>
 
 namespace KDecoration3
@@ -17,6 +19,8 @@ class DecorationButtonGroup;
 
 namespace Atlas
 {
+
+class SnapPopup;
 
 // Токены tokens.json для одной темы: кнопки окна (wc-*), обводка и блик окна.
 struct Tokens {
@@ -56,12 +60,18 @@ protected:
     void hoverEnterEvent(QHoverEvent *event) override;
     void hoverMoveEvent(QHoverEvent *event) override;
     void hoverLeaveEvent(QHoverEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
 private:
     void updateLayout();
     void updateButtons(qreal titleBar);
     void updateShadow();
+    void updateOutline();
     void updateGroupHover(const QPointF &pos);
+    KDecoration3::DecorationButton *zoomButton() const;
+    void showSnap();
+    void hideSnap();
+    void applySnap(int layout, int zone);
     bool isMaximized() const;
     QColor titleBarColor() const;
     qreal cornerRadius() const;
@@ -71,6 +81,18 @@ private:
     QVariantAnimation *m_glyphAnimation = nullptr;
     qreal m_glyphOpacity = 0;
     bool m_groupHovered = false;
+
+    // Фокус окна 0…1: тень и кольцо переходят между неактивным и активным за dur-medium
+    QVariantAnimation *m_focusAnimation = nullptr;
+    qreal m_focus = 0;
+
+    // Раскладки: delay-snap на зелёной кнопке, закрытие через 220 мс после ухода курсора
+    QTimer *m_snapArm = nullptr;
+    QTimer *m_snapDisarm = nullptr;
+    QPointer<SnapPopup> m_snapPopup;
+    QPointF m_hoverPos;
+    QPointF m_snapOrigin; // левый верхний угол окна на экране
+    bool m_zoomHovered = false;
 };
 
 class Button : public KDecoration3::DecorationButton

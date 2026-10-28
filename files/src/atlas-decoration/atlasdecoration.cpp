@@ -3,6 +3,7 @@
  */
 #include "atlasdecoration.h"
 #include "atlasshadow.h"
+#include "atlassnap.h"
 
 #include <KDecoration3/DecoratedWindow>
 #include <KDecoration3/DecorationButtonGroup>
@@ -11,9 +12,15 @@
 #include <KDecoration3/ScaleHelpers>
 #include <KPluginFactory>
 
+#include <QCursor>
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QDBusPendingCall>
+#include <QFile>
 #include <QHoverEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QStandardPaths>
 
 K_PLUGIN_FACTORY_WITH_JSON(AtlasDecorationFactory, "atlas.json", registerPlugin<Atlas::Decoration>(); registerPlugin<Atlas::Button>();)
 
@@ -36,6 +43,11 @@ constexpr qreal ButtonSize = 14;
 constexpr qreal ButtonHit = 24; // 14 + 2 × 5: соседние зоны касаются, зазор кнопок 10
 constexpr qreal TitleGap = 16; // от последней кнопки до имени окна
 constexpr int GlyphDuration = 100; // dur-micro
+constexpr int FocusDuration = 240; // dur-medium
+constexpr int SnapDelay = 450; // delay-snap
+constexpr int SnapLinger = 220; // как в WindowControls: попап живёт после ухода курсора
+constexpr qreal SnapGap = 8; // space-8: зазор между окнами и до края
+constexpr int ShadowSteps = 8; // промежуточные тени перехода фокуса
 
 // CSS пишет альфу последней (#rrggbbaa), QColor ждёт её первой.
 QColor rgba(QRgb rgb, int alpha)
@@ -72,14 +84,18 @@ const QList<BoxShadow> s_shadowLayers[2][2] = {
 };
 
 int s_decorationCount = 0;
-std::shared_ptr<KDecoration3::DecorationShadow> s_shadows[2][2]; // [тёмная][активное]
+int s_snapCount = 0;
+std::shared_ptr<KDecoration3::DecorationShadow> s_shadows[2][ShadowSteps + 1]; // [тёмная][шаг фокуса]
 
-std::shared_ptr<KDecoration3::DecorationShadow> shadowFor(bool dark, bool active)
+// Тень для доли фокуса: слои shadow-window-inactive → shadow-window попарно, как CSS-переход
+std::shared_ptr<KDecoration3::DecorationShadow> shadowFor(bool dark, qreal focus)
 {
-    auto &shadow = s_shadows[dark][active];
+    const int step = qBound(0, qRound(focus * ShadowSteps), ShadowSteps);
+    auto &shadow = s_shadows[dark][step];
     if (!shadow) {
         QMarginsF padding;
-        const QImage image = renderBoxShadow(s_shadowLayers[dark][active], CornerRadius, &padding);
+        const auto layers = mixShadows(s_shadowLayers[dark][0], s_shadowLayers[dark][1], qreal(step) / ShadowSteps);
+        const QImage image = renderBoxShadow(layers, CornerRadius, &padding);
         shadow = std::make_shared<KDecoration3::DecorationShadow>();
         shadow->setPadding(padding);
         shadow->setInnerShadowRect(QRectF(QRectF(image.rect()).center(), QSizeF(1, 1)));
@@ -93,12 +109,16 @@ std::shared_ptr<KDecoration3::DecorationShadow> shadowFor(bool dark, bool active
 Decoration::Decoration(QObject *parent, const QVariantList &args)
     : KDecoration3::Decoration(parent, args)
     , m_glyphAnimation(new QVariantAnimation(this))
+    , m_focusAnimation(new QVariantAnimation(this))
+    , m_snapArm(new QTimer(this))
+    , m_snapDisarm(new QTimer(this))
 {
     s_decorationCount++;
 }
 
 Decoration::~Decoration()
 {
+    delete m_snapPopup;
     if (--s_decorationCount == 0) {
         for (auto &row : s_shadows) {
             for (auto &shadow : row) {
@@ -120,12 +140,34 @@ bool Decoration::init()
         update(m_rightButtons->geometry());
     });
 
+    m_focus = window()->isActive() ? 1 : 0;
+    m_focusAnimation->setDuration(FocusDuration);
+    m_focusAnimation->setEasingCurve(QEasingCurve::OutCubic);
+    connect(m_focusAnimation, &QVariantAnimation::valueChanged, this, [this](const QVariant &value) {
+        m_focus = value.toReal();
+        updateShadow();
+        updateOutline();
+    });
+
+    m_snapArm->setSingleShot(true);
+    m_snapArm->setInterval(SnapDelay);
+    connect(m_snapArm, &QTimer::timeout, this, &Decoration::showSnap);
+    m_snapDisarm->setSingleShot(true);
+    m_snapDisarm->setInterval(SnapLinger);
+    connect(m_snapDisarm, &QTimer::timeout, this, &Decoration::hideSnap);
+
     m_leftButtons = new KDecoration3::DecorationButtonGroup(KDecoration3::DecorationButtonGroup::Position::Left, this, &Button::create);
     m_rightButtons = new KDecoration3::DecorationButtonGroup(KDecoration3::DecorationButtonGroup::Position::Right, this, &Button::create);
 
     const auto w = window();
     const auto s = settings().get();
-    connect(w, &KDecoration3::DecoratedWindow::activeChanged, this, &Decoration::updateLayout);
+    connect(w, &KDecoration3::DecoratedWindow::activeChanged, this, [this]() {
+        m_focusAnimation->stop();
+        m_focusAnimation->setStartValue(m_focus);
+        m_focusAnimation->setEndValue(window()->isActive() ? 1.0 : 0.0);
+        m_focusAnimation->start();
+        updateLayout();
+    });
     connect(w, &KDecoration3::DecoratedWindow::paletteChanged, this, &Decoration::updateLayout);
     connect(w, &KDecoration3::DecoratedWindow::maximizedChanged, this, &Decoration::updateLayout);
     connect(w, &KDecoration3::DecoratedWindow::maximizedHorizontallyChanged, this, &Decoration::updateLayout);
@@ -188,16 +230,7 @@ void Decoration::updateLayout()
     // Нижние углы содержимого скругляет KWin, верхние — заголовок.
     const qreal bottom = window()->isShaded() ? 0 : radius;
     setBorderRadius(KDecoration3::BorderRadius(0, 0, bottom, bottom));
-    if (isMaximized()) {
-        setBorderOutline(KDecoration3::BorderOutline());
-    } else {
-        // Кольцо 0.5px: на экране 1× — 1px с половинной альфой.
-        const qreal thickness = KDecoration3::pixelSize(scale);
-        QColor ring = window()->isActive() ? tokens().ring : tokens().ringInactive;
-        ring.setAlphaF(ring.alphaF() * std::min<qreal>(1.0, 0.5 / thickness));
-        setBorderOutline(KDecoration3::BorderOutline(thickness, ring, KDecoration3::BorderRadius(radius)));
-    }
-
+    updateOutline();
     updateButtons(titleBar);
     updateShadow();
     update();
@@ -215,7 +248,21 @@ void Decoration::updateButtons(qreal titleBar)
 
 void Decoration::updateShadow()
 {
-    setShadow(shadowFor(isDark(), window()->isActive()));
+    setShadow(shadowFor(isDark(), m_focus));
+}
+
+void Decoration::updateOutline()
+{
+    if (isMaximized()) {
+        setBorderOutline(KDecoration3::BorderOutline());
+        return;
+    }
+    // Кольцо 0.5px: на экране 1× — 1px с половинной альфой; цвет переходит вместе с тенью.
+    const qreal thickness = KDecoration3::pixelSize(window()->nextScale());
+    const QColor from = tokens().ringInactive;
+    QColor ring = tokens().ring;
+    ring.setAlphaF((from.alphaF() + (ring.alphaF() - from.alphaF()) * m_focus) * std::min<qreal>(1.0, 0.5 / thickness));
+    setBorderOutline(KDecoration3::BorderOutline(thickness, ring, KDecoration3::BorderRadius(cornerRadius())));
 }
 
 void Decoration::hoverEnterEvent(QHoverEvent *event)
@@ -236,8 +283,46 @@ void Decoration::hoverLeaveEvent(QHoverEvent *event)
     updateGroupHover(QPointF(-1, -1));
 }
 
+void Decoration::mousePressEvent(QMouseEvent *event)
+{
+    KDecoration3::Decoration::mousePressEvent(event);
+    m_snapArm->stop();
+    hideSnap();
+}
+
+KDecoration3::DecorationButton *Decoration::zoomButton() const
+{
+    for (auto group : {m_leftButtons, m_rightButtons}) {
+        for (KDecoration3::DecorationButton *button : group->buttons()) {
+            if (button->type() == DecorationButtonType::Maximize) {
+                return button;
+            }
+        }
+    }
+    return nullptr;
+}
+
 void Decoration::updateGroupHover(const QPointF &pos)
 {
+    // Задержка на зелёной кнопке открывает раскладки; уход курсора закрывает их с запасом
+    m_hoverPos = pos;
+    const auto zoom = zoomButton();
+    const bool zoomHovered = zoom && zoom->isEnabled() && window()->isResizeable() && zoom->geometry().contains(pos);
+    if (zoomHovered != m_zoomHovered) {
+        m_zoomHovered = zoomHovered;
+        if (zoomHovered) {
+            m_snapDisarm->stop();
+            if (!m_snapPopup) {
+                m_snapArm->start();
+            }
+        } else {
+            m_snapArm->stop();
+            if (m_snapPopup) {
+                m_snapDisarm->start();
+            }
+        }
+    }
+
     const bool hovered = (!m_leftButtons->buttons().isEmpty() && m_leftButtons->geometry().contains(pos))
         || (!m_rightButtons->buttons().isEmpty() && m_rightButtons->geometry().contains(pos));
     if (hovered == m_groupHovered) {
@@ -250,6 +335,122 @@ void Decoration::updateGroupHover(const QPointF &pos)
     }
     update(m_leftButtons->geometry());
     update(m_rightButtons->geometry());
+}
+
+void Decoration::showSnap()
+{
+    if (m_snapPopup || !m_zoomHovered) {
+        return;
+    }
+    const bool dark = isDark();
+    auto rgba = [](QRgb rgb, int a) {
+        QColor c(rgb);
+        c.setAlpha(a);
+        return c;
+    };
+    SnapColors colors;
+    colors.dark = dark;
+    colors.background = dark ? QColor(0x33322f) : QColor(0xfcfbf9);
+    colors.ring = dark ? rgba(0x000000, 0xcc) : rgba(0x1d1c1a, 0x24);
+    colors.highlight = tokens().highlight;
+    colors.title = dark ? QColor(0xb3afa7) : QColor(0x55524b);
+    colors.layout = dark ? rgba(0xf2f0eb, 0x21) : rgba(0x1d1c1a, 0x1a);
+    colors.zone = dark ? rgba(0xf2f0eb, 0x1f) : QColor(Qt::white);
+    colors.zoneRing = dark ? rgba(0xffffff, 0x1a) : rgba(0x1d1c1a, 0x29);
+    colors.accent = window()->palette().color(QPalette::Highlight);
+
+    // Окно декорации на экране: курсор минус его место в декорации
+    m_snapOrigin = QPointF(QCursor::pos()) - m_hoverPos;
+    const QRectF group = m_leftButtons->buttons().isEmpty() ? m_rightButtons->geometry() : m_leftButtons->geometry();
+    const qreal inset = (ButtonHit - ButtonSize) / 2;
+    // .at-snap: на 10 левее группы кнопок и на 10 ниже кружков
+    const QPointF anchor = m_snapOrigin + QPointF(group.left() + inset - 10, group.bottom() - inset + 10);
+
+    m_snapPopup = new SnapPopup(colors, settings()->font());
+    m_snapPopup->setPosition((anchor - m_snapPopup->panelOrigin()).toPoint());
+    connect(m_snapPopup, &SnapPopup::entered, m_snapDisarm, &QTimer::stop);
+    connect(m_snapPopup, &SnapPopup::left, m_snapDisarm, qOverload<>(&QTimer::start));
+    connect(m_snapPopup, &SnapPopup::chosen, this, [this](int layout, int zone) {
+        applySnap(layout, zone);
+        hideSnap();
+    });
+    m_snapPopup->show();
+}
+
+void Decoration::hideSnap()
+{
+    m_snapDisarm->stop();
+    if (m_snapPopup) {
+        m_snapPopup->hide();
+        m_snapPopup->deleteLater();
+        m_snapPopup.clear();
+    }
+}
+
+void Decoration::applySnap(int layout, int zone)
+{
+    // У декорации нет доступа к геометрии окна: скрипт KWin берёт верхнее окно под
+    // зелёной кнопкой и ставит его в зону рабочей области с зазором space-8.
+    const auto zoom = zoomButton();
+    if (!zoom) {
+        return;
+    }
+    const QPointF point = m_snapOrigin + zoom->geometry().center();
+    const QRectF f = SnapPopup::zoneFraction(layout, zone);
+    const QString script = QStringLiteral(
+                               "(function () {\n"
+                               "const p = {x: %1, y: %2}, f = {x: %3, y: %4, w: %5, h: %6}, g = %7;\n"
+                               "const stack = workspace.stackingOrder;\n"
+                               "for (let i = stack.length - 1; i >= 0; --i) {\n"
+                               "    const w = stack[i];\n"
+                               "    if (!w.normalWindow || w.minimized || !(w.onAllDesktops || w.desktops.indexOf(workspace.currentDesktop) >= 0)) {\n"
+                               "        continue;\n"
+                               "    }\n"
+                               "    const r = w.frameGeometry;\n"
+                               "    if (p.x < r.x || p.y < r.y || p.x >= r.x + r.width || p.y >= r.y + r.height) {\n"
+                               "        continue;\n"
+                               "    }\n"
+                               "    w.setMaximize(false, false);\n"
+                               "    const a = workspace.clientArea(KWin.MaximizeArea, w);\n"
+                               "    const W = a.width - g, H = a.height - g;\n"
+                               "    w.frameGeometry = {x: Math.round(a.x + g + f.x * W), y: Math.round(a.y + g + f.y * H),\n"
+                               "                       width: Math.round(f.w * W - g), height: Math.round(f.h * H - g)};\n"
+                               "    workspace.activeWindow = w;\n"
+                               "    break;\n"
+                               "}\n"
+                               "})();\n")
+                               .arg(point.x())
+                               .arg(point.y())
+                               .arg(f.x())
+                               .arg(f.y())
+                               .arg(f.width())
+                               .arg(f.height())
+                               .arg(SnapGap);
+
+    const QString name = QStringLiteral("atlas-snap-%1").arg(++s_snapCount);
+    const QString path = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation) + QLatin1Char('/') + name + QStringLiteral(".js");
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return;
+    }
+    file.write(script.toUtf8());
+    file.close();
+
+    // Свой же процесс по D-Bus — только асинхронно, иначе KWin ждал бы сам себя
+    auto call = [](const QString &method, const QVariantList &args) {
+        auto message = QDBusMessage::createMethodCall(QStringLiteral("org.kde.KWin"),
+                                                      QStringLiteral("/Scripting"),
+                                                      QStringLiteral("org.kde.kwin.Scripting"),
+                                                      method);
+        message.setArguments(args);
+        QDBusConnection::sessionBus().asyncCall(message);
+    };
+    call(QStringLiteral("loadScript"), {path, name});
+    call(QStringLiteral("start"), {});
+    QTimer::singleShot(2000, [call, name, path]() {
+        call(QStringLiteral("unloadScript"), {name});
+        QFile::remove(path);
+    });
 }
 
 void Decoration::paint(QPainter *painter, const QRectF &repaintArea)
