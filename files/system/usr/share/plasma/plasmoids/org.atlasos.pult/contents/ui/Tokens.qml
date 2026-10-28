@@ -18,7 +18,7 @@ QtObject {
     readonly property color cardRing: dark ? "#0af2f0eb" : "#0d1d1c1a"
     readonly property color controlRing: "#141d1c1a"
     readonly property color accent: Kirigami.Theme.highlightColor
-    readonly property color onAccent: Kirigami.Theme.highlightedTextColor
+    readonly property color textOnAccent: dark ? "#06201e" : "#ffffff"
 
     readonly property int radiusTile: 10 // radius-md = radius-xl 18 − отступ 8
     readonly property int gap: 8

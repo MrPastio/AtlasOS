@@ -29,6 +29,6 @@ Rectangle {
     Glyph {
         anchors.centerIn: parent
         name: orb.glyph
-        color: orb.on ? orb.tokens.onAccent : orb.tokens.ink
+        color: orb.on ? orb.tokens.textOnAccent : orb.tokens.ink
     }
 }

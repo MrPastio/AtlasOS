@@ -17,7 +17,9 @@ bar.hiding = "none";
 bar.lengthMode = "fill";
 bar.opacity = "opaque";
 
-bar.addWidget("org.atlasos.compass");
+// Компас: системное меню; ❖ (как «меню приложений») и ❖ Пробел — поиск и запуск
+var compass = bar.addWidget("org.atlasos.compass");
+compass.globalShortcut = "Meta+Space";
 bar.addWidget("org.atlasos.appname");
 bar.addWidget("org.kde.plasma.appmenu");
 bar.addWidget("org.kde.plasma.panelspacer");

@@ -1,7 +1,8 @@
 /*
  * Компас в строке меню «Атласа»: символ compass и системное меню
  * (01-shell.md: «Об этом компьютере», «Настройки…», «Центр приложений»,
- * «Заблокировать», «Сон», «Перезагрузить…», «Выключить…»).
+ * «Заблокировать», «Сон», «Перезагрузить…», «Выключить…»), а по ❖ — поиск
+ * и запуск по центру экрана (Launcher.qml).
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 import QtQuick
@@ -23,15 +24,6 @@ PlasmoidItem {
 
     Sessions.SessionManagement { id: session }
 
-    // ❖ и Alt+F1: plasmashell активирует апплет, заявивший org.kde.plasma.launchermenu.
-    // До своего Компаса (поиск и запуск, 01-shell.md) открывает KRunner.
-    Connections {
-        target: Plasmoid
-        function onActivated() {
-            executable.run("dbus-send --session --type=method_call --dest=org.kde.krunner /App org.kde.krunner.App.toggleDisplay");
-        }
-    }
-
     P5Support.DataSource {
         id: executable
         engine: "executable"
@@ -43,6 +35,19 @@ PlasmoidItem {
         id: button
         open: menu.status === PlasmaExtras.Menu.Open
         onActivated: menu.openRelative()
+
+        // ❖ и Alt+F1: plasmashell активирует апплет, заявивший org.kde.plasma.launchermenu;
+        // ❖ Пробел — собственное сочетание апплета (раскладка).
+        Connections {
+            target: Plasmoid
+            function onActivated() {
+                launcher.toggle();
+            }
+        }
+
+        Launcher {
+            id: launcher
+        }
 
         Kirigami.Icon {
             anchors.centerIn: parent
