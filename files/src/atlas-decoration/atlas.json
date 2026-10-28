@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Description": "Декорация окон «Атласа»: кнопки слева, единый заголовок",
+        "Description[en]": "Atlas window decoration: buttons on the left, unified title bar",
+        "EnabledByDefault": true,
+        "Name": "Атлас"
+    },
+    "org.kde.kdecoration3": {
+        "blur": false,
+        "recommendedBorderSize": "None"
+    }
+}

@@ -15,3 +15,10 @@ Saturation=180
 Duration=320
 InScale=0.96
 OutScale=0.96
+
+# Декорация «Атлас» (files/src/atlas-decoration): кнопки окна слева — закрыть, свернуть, развернуть.
+[org.kde.kdecoration2]
+library=org.atlasos.decoration
+theme=Атлас
+ButtonsOnLeft=XIA
+ButtonsOnRight=

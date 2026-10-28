@@ -20,8 +20,10 @@ LayoutName=org.kde.breeze.desktop
 LayoutName=org.kde.breeze.desktop
 
 [kwinrc][org.kde.kdecoration2]
-library=org.kde.breeze
-theme=Breeze
+library=org.atlasos.decoration
+theme=Атлас
+ButtonsOnLeft=XIA
+ButtonsOnRight=
 
 [KSplash]
 Theme=com.valve.vapor

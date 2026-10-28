@@ -9,5 +9,19 @@ description: "AtlasOS — macOS-like desktop on Bazzite KDE (NVIDIA)"
 base-image: ghcr.io/ublue-os/bazzite-nvidia-open
 image-version: stable
 
+# Своя декорация окон собирается отдельной стадией на том же базовом образе,
+# чтобы заголовки KDecoration совпадали с KWin; в образ копируется только плагин (common.yml).
+stages:
+  - name: atlas-decoration
+    from: ghcr.io/ublue-os/bazzite-nvidia-open:stable
+    modules:
+      - type: files
+        files:
+          - source: src/atlas-decoration
+            destination: /tmp/atlas-decoration
+      - type: script
+        snippets:
+          - bash /tmp/atlas-decoration/build.sh
+
 modules:
   - from-file: common.yml

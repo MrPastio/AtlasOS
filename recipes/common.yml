@@ -13,4 +13,10 @@ modules:
       packages:
         - jetbrains-mono-fonts-all
 
+  # Декорация окон «Атлас» из стадии atlas-decoration (recipe*.yml).
+  - type: copy
+    from: atlas-decoration
+    src: /out/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.atlasos.decoration.so
+    dest: /usr/lib64/qt6/plugins/org.kde.kdecoration3/org.atlasos.decoration.so
+
   - type: signing # подпись образа, чтобы обновления проверялись ключом
