@@ -25,8 +25,8 @@ theme=Атлас
 ButtonsOnLeft=XIA
 ButtonsOnRight=
 
-[KSplash]
-Theme=com.valve.vapor
+[ksplashrc][KSplash]
+Theme=org.atlasos.dark.desktop
 
 [Wallpaper]
 Image=Meridian
