@@ -13,6 +13,7 @@ modules:
       packages:
         - jetbrains-mono-fonts-all
         - papirus-icon-theme # основа тем значков «Атлас» (files/scripts/atlas-icons.sh)
+        - gh # GitHub CLI: клон приватных репозиториев и PR прямо из системы
 
   - type: script
     scripts:
