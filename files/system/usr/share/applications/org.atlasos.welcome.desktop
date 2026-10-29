@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to Atlas
+Name[ru]=Добро пожаловать
+Comment=Appearance and apps on first login
+Comment[ru]=Оформление и приложения при первом входе
+Exec=atlas-welcome
+Icon=preferences-desktop-theme-global
+Categories=System;Settings;
+Keywords=welcome;setup;first;приветствие;настройка;

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to Atlas
+Name[ru]=Добро пожаловать
+# --once: окно выходит сразу, если его уже прошли (~/.config/atlasos/welcome-done)
+Exec=atlas-welcome --once
+Icon=preferences-desktop-theme-global
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=2
+NoDisplay=true

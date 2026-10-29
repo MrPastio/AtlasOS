@@ -24,4 +24,10 @@ modules:
     src: /out/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.atlasos.decoration.so
     dest: /usr/lib64/qt6/plugins/org.kde.kdecoration3/org.atlasos.decoration.so
 
+  # «Добро пожаловать в Атлас» из стадии atlas-welcome (recipe*.yml); интерфейс — files/system/usr/share/atlasos/welcome.
+  - type: copy
+    from: atlas-welcome
+    src: /out/usr/bin/atlas-welcome
+    dest: /usr/bin/atlas-welcome
+
   - type: signing # подпись образа, чтобы обновления проверялись ключом

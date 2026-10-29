@@ -23,5 +23,16 @@ stages:
         snippets:
           - bash /tmp/atlas-decoration/build.sh
 
+  - name: atlas-welcome
+    from: ghcr.io/ublue-os/bazzite-nvidia-open:stable
+    modules:
+      - type: files
+        files:
+          - source: src/atlas-welcome
+            destination: /tmp/atlas-welcome
+      - type: script
+        snippets:
+          - bash /tmp/atlas-welcome/build.sh
+
 modules:
   - from-file: common.yml
