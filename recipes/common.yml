@@ -12,6 +12,11 @@ modules:
     install:
       packages:
         - jetbrains-mono-fonts-all
+        - papirus-icon-theme # основа тем значков «Атлас» (files/scripts/atlas-icons.sh)
+
+  - type: script
+    scripts:
+      - atlas-icons.sh
 
   # Декорация окон «Атлас» из стадии atlas-decoration (recipe*.yml).
   - type: copy

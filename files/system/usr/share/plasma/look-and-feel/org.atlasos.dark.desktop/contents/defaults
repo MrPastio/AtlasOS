@@ -5,7 +5,7 @@ widgetStyle=Breeze
 ColorScheme=AtlasDark
 
 [kdeglobals][Icons]
-Theme=breeze-dark
+Theme=Atlas-Dark
 
 [plasmarc][Theme]
 name=atlas-dark

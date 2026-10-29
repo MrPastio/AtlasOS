@@ -18,7 +18,7 @@ smallestReadableFont=Onest,8,-1,5,500,0,0,0,0,0,0,0,0,0,0,1
 fixed=JetBrains Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
 
 [Icons]
-Theme=breeze
+Theme=Atlas
 
 # Это настройка konsole из /etc/xdg/konsolerc, но Bazzite держит её здесь (см. исходный файл Bazzite)
 [Desktop Entry]
