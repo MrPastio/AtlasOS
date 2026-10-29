@@ -14,7 +14,7 @@ name=atlas
 cursorTheme=breeze_cursors
 
 [kwinrc][WindowSwitcher]
-LayoutName=org.kde.breeze.desktop
+LayoutName=atlas
 
 [kwinrc][DesktopSwitcher]
 LayoutName=org.kde.breeze.desktop

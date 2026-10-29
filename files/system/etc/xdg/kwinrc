@@ -27,3 +27,7 @@ ButtonsOnLeft=XIA
 ButtonsOnRight=
 # без подсказок у кнопок: задержка на зелёной открывает раскладки, подсказка легла бы на них
 ShowToolTips=false
+
+# Alt+Tab — переключатель «Атласа» (/usr/share/kwin-wayland/tabbox/atlas)
+[TabBox]
+LayoutName=atlas
