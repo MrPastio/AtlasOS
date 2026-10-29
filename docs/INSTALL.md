@@ -42,3 +42,21 @@
 - Claude Desktop живёт в контейнере distrobox `claude` (официальная сборка только для Ubuntu/Debian):
   `atlas-claude install | update | status`.
 - Если Claude показывает чёрное окно — он ждёт KDE Wallet: введите пароль в его запросе.
+
+## Перенести работу
+
+Код — на GitHub, память Claude Code — в приватном репозитории `claude-memory`
+(в нём `restore.sh`: память кладётся под ключ нового пути проекта).
+
+```bash
+gh auth login
+mkdir -p ~/Projects && cd ~/Projects
+gh repo clone MrPastio/AtlasOS
+gh repo clone MrPastio/claude-memory ~/claude-memory
+~/claude-memory/restore.sh --global
+~/claude-memory/restore.sh E--AtlasOS ~/Projects/AtlasOS
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+Остальные проекты — так же: `gh repo clone …`, затем `restore.sh <ключ> <папка>`
+(`restore.sh --list` покажет ключи). Claude Code запускается командой `claude` из папки проекта.
