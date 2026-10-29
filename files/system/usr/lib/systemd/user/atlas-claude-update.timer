@@ -1,0 +1,10 @@
+[Unit]
+Description=Обновлять Claude Desktop раз в день
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1d
+Persistent=true
+
+[Install]
+WantedBy=timers.target

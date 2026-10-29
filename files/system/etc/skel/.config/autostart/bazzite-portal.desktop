@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Bazzite Portal
+Exec=yafti_gtk.py /usr/share/yafti/yafti.yml
+Type=Application
+# Атлас: вместо этого мастера при первом входе открывается atlas-welcome
+Hidden=true
+X-GNOME-Autostart-enabled=false

@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Системное меню строки меню «Атласа»",
+        "Description[en]": "Atlas menu bar system menu",
+        "Icon": "compass",
+        "Id": "org.atlasos.compass",
+        "License": "GPL-2.0-or-later",
+        "Name": "Компас",
+        "Name[en]": "Compass",
+        "Version": "1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-Provides": [
+        "org.kde.plasma.launchermenu"
+    ]
+}

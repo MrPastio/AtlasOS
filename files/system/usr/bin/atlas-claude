@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Claude Desktop на Атласе. Официальная сборка Anthropic для Linux есть только для
+# Ubuntu/Debian (apt), поэтому она живёт в контейнере distrobox «claude» на Ubuntu 24.04
+# и выводится в Компас и Док как обычное приложение.
+#
+#   atlas-claude install — создать контейнер, поставить claude-desktop из apt-репозитория
+#                          Anthropic (ключ проверяется по отпечатку) и вывести в меню
+#   atlas-claude update  — обновить claude-desktop (atlas-claude-update.timer, раз в день)
+#   atlas-claude status  — 0, если Claude установлен
+set -euo pipefail
+
+BOX=claude
+IMAGE=docker.io/library/ubuntu:24.04
+ENTRY="${XDG_DATA_HOME:-$HOME/.local/share}/applications/claude-com.anthropic.Claude.desktop"
+# Отпечаток ключа подписи из инструкции Anthropic: code.claude.com/docs/en/desktop-linux
+FINGERPRINT=31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE
+
+have_box() { podman container exists "$BOX" 2>/dev/null; }
+in_box() { distrobox enter --no-tty "$BOX" -- "$@"; }
+
+case "${1:-}" in
+  status)
+    [ -f "$ENTRY" ] && have_box ;;
+  install)
+    have_box || distrobox create --yes --no-entry --name "$BOX" --image "$IMAGE"
+    in_box bash -s "$FINGERPRINT" <<'INNER'
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+key=/usr/share/keyrings/claude-desktop-archive-keyring.asc
+sudo apt-get update -q
+sudo apt-get install -y -q curl gnupg ca-certificates
+sudo curl -fsSLo "$key" https://downloads.claude.ai/claude-desktop/key.asc
+fpr=$(gpg --show-keys --with-colons "$key" | awk -F: '$1=="fpr"{print $10; exit}')
+if [ "$fpr" != "$1" ]; then
+  echo "Ключ Claude Desktop не совпал с ожидаемым ($fpr)" >&2
+  sudo rm -f "$key"
+  exit 1
+fi
+echo "deb [arch=amd64,arm64 signed-by=$key] https://downloads.claude.ai/claude-desktop/apt/stable stable main" \
+  | sudo tee /etc/apt/sources.list.d/claude-desktop.list >/dev/null
+sudo apt-get update -q
+sudo apt-get install -y -q claude-desktop
+# На KDE ключи хранит KDE Wallet; gnome-keyring из рекомендаций с ним конфликтует
+sudo apt-get remove -y -q gnome-keyring || true
+INNER
+    in_box distrobox-export --app claude-desktop --export-label none
+    echo "Claude установлен" ;;
+  update)
+    have_box || exit 0
+    in_box bash -c 'export DEBIAN_FRONTEND=noninteractive; sudo apt-get update -q && sudo apt-get install -y -q --only-upgrade claude-desktop' ;;
+  *)
+    sed -n '2,11p' "$0"; exit 2 ;;
+esac

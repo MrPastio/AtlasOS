@@ -1,0 +1,17 @@
+[Wallpaper]
+defaultWallpaperTheme=Meridian
+defaultFileSuffix=.webp
+defaultWidth=2560
+defaultHeight=1600
+
+# Панель становится непрозрачной, когда окно развёрнуто
+[AdaptiveTransparency]
+enabled=true
+
+# Насыщенность под материалами даёт эффект размытия KWin (Saturation в kwinrc);
+# эффект контраста Plasma отключён, чтобы не поднимать её дважды.
+[ContrastEffect]
+enabled=false
+
+[BlurBehindEffect]
+enabled=true

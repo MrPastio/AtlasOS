@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Description": "Дизайн-система «Атлас»",
+        "Description[en]": "Atlas design system",
+        "Id": "org.atlasos.dark.desktop",
+        "License": "GPL-2.0-or-later",
+        "Name": "Атлас тёмная",
+        "Name[en]": "Atlas Dark",
+        "Version": "1"
+    },
+    "X-Plasma-MainScript": "defaults"
+}

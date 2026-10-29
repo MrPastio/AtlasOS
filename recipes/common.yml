@@ -7,4 +7,38 @@ modules:
       - source: system
         destination: / # files/system/* -> корень образа
 
+  # Моноширинный шрифт «Атласа». Onest (интерфейс) лежит файлом в files/system/usr/share/fonts.
+  - type: dnf
+    install:
+      packages:
+        - jetbrains-mono-fonts-all
+        - papirus-icon-theme # основа тем значков «Атлас» (files/scripts/atlas-icons.sh)
+
+  - type: script
+    scripts:
+      - atlas-icons.sh
+
+  # Декорация окон «Атлас» из стадии atlas-decoration (recipe*.yml).
+  - type: copy
+    from: atlas-decoration
+    src: /out/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.atlasos.decoration.so
+    dest: /usr/lib64/qt6/plugins/org.kde.kdecoration3/org.atlasos.decoration.so
+
+  # «Добро пожаловать в Атлас» из стадии atlas-welcome (recipe*.yml); интерфейс — files/system/usr/share/atlasos/welcome.
+  - type: copy
+    from: atlas-welcome
+    src: /out/usr/bin/atlas-welcome
+    dest: /usr/bin/atlas-welcome
+
+  # «Обновление системы» — та же запускалка, страница выбирается по имени программы
+  - type: script
+    snippets:
+      - ln -sf atlas-welcome /usr/bin/atlas-updates
+
+  # Claude Desktop ставится по желанию (atlas-claude install), обновляется своим таймером
+  - type: systemd
+    user:
+      enabled:
+        - atlas-claude-update.timer
+
   - type: signing # подпись образа, чтобы обновления проверялись ключом

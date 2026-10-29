@@ -1,0 +1,5 @@
+# Сочетания AtlasOS по умолчанию (01-shell.md «Клавиатура»). Формат: текущее,по умолчанию,описание.
+# ❖ Tab — Обзор, поэтому у «Перебора окон» остаётся только Alt+Tab.
+[kwin]
+Walk Through Windows=Alt+Tab,Alt+Tab\tMeta+Tab,Walk Through Windows
+Atlas Overview=Meta+Tab,Meta+Tab,Обзор

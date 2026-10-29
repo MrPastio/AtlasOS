@@ -1,0 +1,9 @@
+[Unit]
+Description=Обновить Claude Desktop в контейнере distrobox
+# Bazzite не обновляет контейнеры сам (/etc/uupd/config.json), поэтому Claude — отдельно
+ConditionPathExists=%h/.local/share/applications/claude-com.anthropic.Claude.desktop
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/atlas-claude update

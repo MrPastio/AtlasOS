@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Сгенерировано tools/gen_plasma_style.py из tokens.json «Атласа». Не править руками. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="68" height="108.0" viewBox="0 0 68 108.0">
+<g id="normal-topleft" transform="translate(0,0)"><rect x="0" y="0" width="6" height="6.0" style="fill:none;stroke:none"/></g>
+<g id="normal-top" transform="translate(0,0)"><rect x="6" y="0" width="16" height="6.0" style="fill:none;stroke:none"/></g>
+<g id="normal-topright" transform="translate(0,0)"><rect x="22" y="0" width="6" height="6.0" style="fill:none;stroke:none"/></g>
+<g id="normal-left" transform="translate(0,0)"><rect x="0" y="6.0" width="6" height="16" style="fill:none;stroke:none"/></g>
+<g id="normal-center" transform="translate(0,0)"><rect x="6" y="6.0" width="16" height="16" style="fill:none;stroke:none"/></g>
+<g id="normal-right" transform="translate(0,0)"><rect x="22" y="6.0" width="6" height="16" style="fill:none;stroke:none"/></g>
+<g id="normal-bottomleft" transform="translate(0,0)"><rect x="0" y="22.0" width="6" height="6.0" style="fill:none;stroke:none"/></g>
+<g id="normal-bottom" transform="translate(0,0)"><rect x="6" y="22.0" width="16" height="6.0" style="fill:none;stroke:none"/></g>
+<g id="normal-bottomright" transform="translate(0,0)"><rect x="22" y="22.0" width="6" height="6.0" style="fill:none;stroke:none"/></g>
+<rect id="normal-hint-stretch-borders" x="36" y="0" width="4" height="4" style="fill:none"/>
+<rect id="normal-hint-top-margin" x="44" y="0" width="10" height="1e-08" style="fill:none"/>
+<rect id="normal-hint-bottom-margin" x="44" y="0" width="10" height="1e-08" style="fill:none"/>
+<rect id="normal-hint-left-margin" x="44" y="0" width="8" height="10" style="fill:none"/>
+<rect id="normal-hint-right-margin" x="44" y="0" width="8" height="10" style="fill:none"/>
+<g id="hover-topleft" transform="translate(0,36.0)"><rect x="0" y="0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M0,6.0 A6,6 0 0 1 6,0.0 H6 V6.0 H0 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-top" transform="translate(0,36.0)"><rect x="6" y="0" width="16" height="6.0" style="fill:none;stroke:none"/><path d="M6,0.0 H22 V6.0 H6 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-topright" transform="translate(0,36.0)"><rect x="22" y="0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M22,0.0 H22 A6,6 0 0 1 28,6.0 V6.0 H22 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-left" transform="translate(0,36.0)"><rect x="0" y="6.0" width="6" height="16" style="fill:none;stroke:none"/><path d="M0,6.0 H6 V22.0 H0 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-center" transform="translate(0,36.0)"><rect x="6" y="6.0" width="16" height="16" style="fill:none;stroke:none"/><path d="M6,6.0 H22 V22.0 H6 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-right" transform="translate(0,36.0)"><rect x="22" y="6.0" width="6" height="16" style="fill:none;stroke:none"/><path d="M22,6.0 H28 V22.0 H22 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-bottomleft" transform="translate(0,36.0)"><rect x="0" y="22.0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M0,22.0 H6 V28.0 H6 A6,6 0 0 1 0,22.0 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-bottom" transform="translate(0,36.0)"><rect x="6" y="22.0" width="16" height="6.0" style="fill:none;stroke:none"/><path d="M6,22.0 H22 V28.0 H6 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="hover-bottomright" transform="translate(0,36.0)"><rect x="22" y="22.0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M22,22.0 H28 V22.0 A6,6 0 0 1 22,28.0 H22 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<rect id="hover-hint-stretch-borders" x="36" y="36.0" width="4" height="4" style="fill:none"/>
+<rect id="hover-hint-top-margin" x="44" y="36.0" width="10" height="1e-08" style="fill:none"/>
+<rect id="hover-hint-bottom-margin" x="44" y="36.0" width="10" height="1e-08" style="fill:none"/>
+<rect id="hover-hint-left-margin" x="44" y="36.0" width="8" height="10" style="fill:none"/>
+<rect id="hover-hint-right-margin" x="44" y="36.0" width="8" height="10" style="fill:none"/>
+<g id="pressed-topleft" transform="translate(0,72.0)"><rect x="0" y="0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M0,6.0 A6,6 0 0 1 6,0.0 H6 V6.0 H0 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-top" transform="translate(0,72.0)"><rect x="6" y="0" width="16" height="6.0" style="fill:none;stroke:none"/><path d="M6,0.0 H22 V6.0 H6 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-topright" transform="translate(0,72.0)"><rect x="22" y="0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M22,0.0 H22 A6,6 0 0 1 28,6.0 V6.0 H22 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-left" transform="translate(0,72.0)"><rect x="0" y="6.0" width="6" height="16" style="fill:none;stroke:none"/><path d="M0,6.0 H6 V22.0 H0 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-center" transform="translate(0,72.0)"><rect x="6" y="6.0" width="16" height="16" style="fill:none;stroke:none"/><path d="M6,6.0 H22 V22.0 H6 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-right" transform="translate(0,72.0)"><rect x="22" y="6.0" width="6" height="16" style="fill:none;stroke:none"/><path d="M22,6.0 H28 V22.0 H22 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-bottomleft" transform="translate(0,72.0)"><rect x="0" y="22.0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M0,22.0 H6 V28.0 H6 A6,6 0 0 1 0,22.0 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-bottom" transform="translate(0,72.0)"><rect x="6" y="22.0" width="16" height="6.0" style="fill:none;stroke:none"/><path d="M6,22.0 H22 V28.0 H6 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<g id="pressed-bottomright" transform="translate(0,72.0)"><rect x="22" y="22.0" width="6" height="6.0" style="fill:none;stroke:none"/><path d="M22,22.0 H28 V22.0 A6,6 0 0 1 22,28.0 H22 Z" style="fill:#0e7a74;fill-opacity:1.0000;stroke:none"/></g>
+<rect id="pressed-hint-stretch-borders" x="36" y="72.0" width="4" height="4" style="fill:none"/>
+<rect id="pressed-hint-top-margin" x="44" y="72.0" width="10" height="1e-08" style="fill:none"/>
+<rect id="pressed-hint-bottom-margin" x="44" y="72.0" width="10" height="1e-08" style="fill:none"/>
+<rect id="pressed-hint-left-margin" x="44" y="72.0" width="8" height="10" style="fill:none"/>
+<rect id="pressed-hint-right-margin" x="44" y="72.0" width="8" height="10" style="fill:none"/>
+</svg>

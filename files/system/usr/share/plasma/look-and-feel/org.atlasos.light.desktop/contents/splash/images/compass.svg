@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <!-- Символ compass из набора Atlas.Icon (как в строке меню), цвет текста поверх обоев -->
+  <circle cx="10" cy="10" r="7.25" fill="none" stroke="#fbfaf7" stroke-width="1.5"/>
+  <path d="M13 7 11.1 11.1 7 13 8.9 8.9z" fill="#fbfaf7" stroke="#fbfaf7" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

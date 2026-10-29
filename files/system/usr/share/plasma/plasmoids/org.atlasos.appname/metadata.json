@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "AtlasOS" }],
+        "Category": "Windows and Tasks",
+        "Description": "Имя активного приложения в строке меню «Атласа»",
+        "Description[en]": "Active application name for the Atlas menu bar",
+        "Icon": "preferences-system-windows",
+        "Id": "org.atlasos.appname",
+        "License": "GPL-2.0-or-later",
+        "Name": "Имя приложения",
+        "Name[en]": "Application Name",
+        "Version": "1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

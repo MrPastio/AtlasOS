@@ -1,0 +1,17 @@
+{
+    "KPackageStructure": "KWin/WindowSwitcher",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "AtlasOS"
+            }
+        ],
+        "Description": "Переключатель «Атласа»: ряд миниатюр окон со значками приложений",
+        "Description[en]": "Atlas switcher: a row of window thumbnails with app icons",
+        "Icon": "preferences-system-windows-switcher-thumbnails",
+        "Id": "atlas",
+        "License": "GPL",
+        "Name": "Атлас",
+        "Name[en]": "Atlas"
+    }
+}
