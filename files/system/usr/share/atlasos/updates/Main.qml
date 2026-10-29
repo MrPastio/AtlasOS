@@ -40,8 +40,9 @@ Kirigami.ApplicationWindow {
 
     function describe(d) {
         if (!d) return "";
+        // d.version — версия базы Bazzite, у соседних сборок Атласа она одна; различает их время сборки
         const date = new Date(d.timestamp * 1000);
-        return "Версия " + d.version + " · собрана " + date.toLocaleDateString(Qt.locale("ru_RU"), "d MMMM yyyy");
+        return "Сборка от " + date.toLocaleString(Qt.locale("ru_RU"), "d MMMM yyyy, HH:mm");
     }
     function lastLine(out) {
         return out.trim().split("\n").pop() || "";
