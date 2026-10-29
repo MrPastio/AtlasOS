@@ -13,12 +13,6 @@ import org.kde.kwin as KWin
 KWin.TabBoxSwitcher {
     id: tabBox
 
-    readonly property bool dark: Kirigami.Theme.textColor.hslLightness > 0.5
-    readonly property color ink: dark ? "#f2f0eb" : "#1d1c1a"
-    readonly property color inkSecondary: dark ? "#b3afa7" : "#55524b"
-    readonly property color accent: Kirigami.Theme.highlightColor
-    readonly property color rim: dark ? "#b3000000" : "#241d1c1a"
-
     readonly property real screenAspect: screenGeometry.height / Math.max(1, screenGeometry.width)
     readonly property int thumbWidth: 208
     readonly property int thumbHeight: Math.round(thumbWidth * screenAspect)
@@ -39,6 +33,11 @@ KWin.TabBoxSwitcher {
             mainItem: FocusScope {
                 id: root
                 focus: true
+                // Цвета — из темы самого окна (Plasma), а не KWin: фон окна рисует она,
+                // и при смене светлое/тёмное они меняются вместе
+                readonly property color ink: Kirigami.Theme.textColor
+                readonly property color inkSecondary: Kirigami.Theme.disabledTextColor
+                readonly property color accent: Kirigami.Theme.highlightColor
                 width: Math.max(tabBox.cellWidth * 2, Math.min(row.count * tabBox.cellWidth, tabBox.screenGeometry.width * 0.9))
                 height: tabBox.cellHeight + caption.height + 8
 
@@ -66,9 +65,9 @@ KWin.TabBoxSwitcher {
                         width: tabBox.cellWidth
                         height: tabBox.cellHeight
                         radius: 14
-                        color: Qt.alpha(tabBox.accent, 0.14)
+                        color: Qt.alpha(root.accent, 0.14)
                         border.width: 2.5
-                        border.color: tabBox.accent
+                        border.color: root.accent
                     }
 
                     delegate: Item {
@@ -122,7 +121,7 @@ KWin.TabBoxSwitcher {
                     text: row.currentItem ? row.currentItem.model.caption : ""
                     textFormat: Text.PlainText
                     elide: Text.ElideMiddle
-                    color: tabBox.ink
+                    color: root.ink
                     font.family: "Onest"
                     font.pixelSize: 13 // control
                     font.weight: Font.Medium
@@ -132,7 +131,7 @@ KWin.TabBoxSwitcher {
                     anchors.centerIn: row
                     visible: row.count === 0
                     text: i18ndc("kwin", "@info:placeholder no entries in the task switcher", "No open windows")
-                    color: tabBox.inkSecondary
+                    color: root.inkSecondary
                     font.family: "Onest"
                     font.pixelSize: 13
                 }
