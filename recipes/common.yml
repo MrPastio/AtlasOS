@@ -35,4 +35,10 @@ modules:
     snippets:
       - ln -sf atlas-welcome /usr/bin/atlas-updates
 
+  # Claude Desktop ставится по желанию (atlas-claude install), обновляется своим таймером
+  - type: systemd
+    user:
+      enabled:
+        - atlas-claude-update.timer
+
   - type: signing # подпись образа, чтобы обновления проверялись ключом

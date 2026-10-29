@@ -269,7 +269,8 @@ Kirigami.ApplicationWindow {
                     onClicked: {
                         win.appsMessage = "";
                         win.appsBusy = true;
-                        sys.run("apps", "flatpak", ["update", "-y", "--noninteractive"]);
+                        // Claude живёт в контейнере (atlas-claude) — обновляем его вместе с Flathub
+                        sys.run("apps", "sh", ["-c", "flatpak update -y --noninteractive; s=$?; atlas-claude update || s=1; exit $s"]);
                     }
                 }
             }

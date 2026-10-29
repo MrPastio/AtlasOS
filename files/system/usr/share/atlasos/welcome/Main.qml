@@ -23,11 +23,16 @@ Kirigami.ApplicationWindow {
     property int step: 0 // 0 привет, 1 оформление, 2 приложения, 3 готово
     property string look: "light"
     property var installed: []
+    property var flatpaks: []
+    property bool wantClaude: false
+    property string installStage: ""
     property bool installing: false
     property string installError: ""
 
-    // Приложения из Flathub, которые чаще всего ставят на Атлас; Steam уже в системе
+    // Приложения, которые чаще всего ставят на Атлас; Steam уже в системе.
+    // Claude — официальная сборка Anthropic для Ubuntu в контейнере (atlas-claude), остальные — Flathub
     readonly property var apps: [
+        { id: "claude", name: "Claude", note: "Официальное приложение Anthropic (бета)", icon: "claude-desktop" },
         { id: "org.mozilla.firefox", name: "Firefox", note: "Браузер" },
         { id: "com.discordapp.Discord", name: "Discord", note: "Голос и чаты" },
         { id: "org.telegram.desktop", name: "Telegram", note: "Мессенджер" },
@@ -35,23 +40,34 @@ Kirigami.ApplicationWindow {
         { id: "com.spotify.Client", name: "Spotify", note: "Музыка" },
         { id: "org.libreoffice.LibreOffice", name: "LibreOffice", note: "Документы и таблицы" }
     ]
-    property var chosen: ({ "com.discordapp.Discord": true, "org.telegram.desktop": true, "com.obsproject.Studio": true })
+    property var chosen: ({ "claude": true, "com.discordapp.Discord": true, "org.telegram.desktop": true, "com.obsproject.Studio": true })
 
-    Component.onCompleted: sys.run("list", "flatpak", ["list", "--app", "--columns=application"])
+    function refreshInstalled() {
+        sys.run("list", "flatpak", ["list", "--app", "--columns=application"]);
+    }
+    Component.onCompleted: refreshInstalled()
 
     Connections {
         target: sys
         function onFinished(tag, code, output) {
             if (tag === "list") {
-                win.installed = output.split("\n").map(s => s.trim()).filter(s => s.length);
-            } else if (tag === "install") {
-                win.installing = false;
-                if (code === 0) {
-                    win.step = 3;
+                win.flatpaks = output.split("\n").map(s => s.trim()).filter(s => s.length);
+                sys.run("claude-status", "atlas-claude", ["status"]);
+            } else if (tag === "claude-status") {
+                win.installed = code === 0 ? win.flatpaks.concat(["claude"]) : win.flatpaks;
+            } else if (tag === "install" || tag === "claude") {
+                if (code !== 0) {
+                    win.installing = false;
+                    win.installError = "Не удалось установить" + (tag === "claude" ? " Claude: " : ": ")
+                        + (output.trim().split("\n").pop() || "ошибка");
+                } else if (tag === "install" && win.wantClaude) {
+                    win.installStage = "Claude";
+                    sys.run("claude", "atlas-claude", ["install"]);
                 } else {
-                    win.installError = "Не удалось установить: " + (output.trim().split("\n").pop() || "ошибка flatpak");
+                    win.installing = false;
+                    win.step = 3;
                 }
-                sys.run("list", "flatpak", ["list", "--app", "--columns=application"]);
+                win.refreshInstalled();
             }
         }
     }
@@ -77,7 +93,15 @@ Kirigami.ApplicationWindow {
         }
         installError = "";
         installing = true;
-        sys.run("install", "flatpak", ["install", "-y", "--noninteractive", "--system", "flathub"].concat(ids));
+        wantClaude = ids.indexOf("claude") >= 0;
+        const flat = ids.filter(id => id !== "claude");
+        if (flat.length) {
+            installStage = "Flathub";
+            sys.run("install", "flatpak", ["install", "-y", "--noninteractive", "--system", "flathub"].concat(flat));
+        } else {
+            installStage = "Claude";
+            sys.run("claude", "atlas-claude", ["install"]);
+        }
     }
 
     component Title: QQC2.Label {
@@ -218,7 +242,7 @@ Kirigami.ApplicationWindow {
                 Layout.fillHeight: true
                 spacing: 12
                 Title { text: "Приложения" }
-                Lead { text: "Отметьте, что поставить из Flathub. Steam и игровые инструменты уже в системе." }
+                Lead { text: "Отметьте, что поставить. Steam и игровые инструменты уже в системе." }
                 QQC2.ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -241,17 +265,19 @@ Kirigami.ApplicationWindow {
                             }
                             contentItem: RowLayout {
                                 spacing: 12
+                                // Размер — через Layout: у ещё не установленного приложения значка нет,
+                                // и без него строка съезжала влево
                                 Kirigami.Icon {
-                                    implicitWidth: 32
-                                    implicitHeight: 32
-                                    source: row.modelData.id
-                                    fallback: "application-x-flatpak"
+                                    Layout.preferredWidth: 32
+                                    Layout.preferredHeight: 32
+                                    source: row.modelData.icon || row.modelData.id
+                                    fallback: "package-x-generic"
                                 }
                                 ColumnLayout {
                                     Layout.fillWidth: true
                                     spacing: 0
-                                    QQC2.Label { text: row.modelData.name; font.family: "Onest"; font.pixelSize: 13; font.weight: Font.Medium }
-                                    QQC2.Label { text: row.have ? "Уже установлено" : row.modelData.note; color: win.inkSecondary; font.family: "Onest"; font.pixelSize: 12 }
+                                    QQC2.Label { Layout.fillWidth: true; text: row.modelData.name; font.family: "Onest"; font.pixelSize: 13; font.weight: Font.Medium }
+                                    QQC2.Label { Layout.fillWidth: true; text: row.have ? "Уже установлено" : row.modelData.note; color: win.inkSecondary; font.family: "Onest"; font.pixelSize: 12 }
                                 }
                                 QQC2.CheckBox {
                                     checked: row.have || !!win.chosen[row.modelData.id]
@@ -265,7 +291,7 @@ Kirigami.ApplicationWindow {
                 QQC2.Label {
                     Layout.fillWidth: true
                     visible: win.installing || win.installError.length > 0
-                    text: win.installing ? "Устанавливаю… Это может занять несколько минут." : win.installError
+                    text: win.installing ? (win.installStage === "Claude" ? "Ставлю Claude… Это займёт несколько минут." : "Устанавливаю приложения… Это может занять несколько минут.") : win.installError
                     color: win.installing ? win.inkSecondary : Kirigami.Theme.negativeTextColor
                     font.family: "Onest"
                     font.pixelSize: 12
