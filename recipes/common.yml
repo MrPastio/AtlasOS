@@ -30,4 +30,9 @@ modules:
     src: /out/usr/bin/atlas-welcome
     dest: /usr/bin/atlas-welcome
 
+  # «Обновление системы» — та же запускалка, страница выбирается по имени программы
+  - type: script
+    snippets:
+      - ln -sf atlas-welcome /usr/bin/atlas-updates
+
   - type: signing # подпись образа, чтобы обновления проверялись ключом
