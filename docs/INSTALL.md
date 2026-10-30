@@ -19,21 +19,20 @@
    установите. Рядом с Windows — выберите свободное место на диске, а не весь диск.
    Secure Boot: при первом запуске Bazzite попросит подтвердить свой ключ (MOK) — пароль
    `universalblue`.
-3. **Переключение на AtlasOS.** Bazzite ещё не знает ключа подписи Атласа, поэтому первый раз
-   без проверки подписи, второй — уже с ней (ключ приезжает вместе с образом):
+3. **Переключение на AtlasOS.** В Konsole на чистом Bazzite:
 
    ```bash
-   rpm-ostree rebase ostree-unverified-registry:ghcr.io/mrpastio/atlasos-nvidia:latest
-   systemctl reboot
+   curl -fsSL https://raw.githubusercontent.com/MrPastio/AtlasOS/main/scripts/install.sh | bash
    ```
 
-   ```bash
-   rpm-ostree rebase ostree-image-signed:docker://ghcr.io/mrpastio/atlasos-nvidia:latest
-   systemctl reboot
-   ```
-
-   Для AMD/Intel — то же с `atlasos` вместо `atlasos-nvidia`.
-4. **Первый вход.** Откроется «Добро пожаловать»: оформление и приложения (Claude, Discord,
+   Скрипт сам выберет образ по видеокарте и дважды перезагрузит систему: Bazzite ещё не знает
+   ключа подписи Атласа, поэтому первый раз образ ставится без проверки подписи, второй — уже
+   с ней (ключ приезжает вместе с образом). После каждого входа он продолжает сам в окне Konsole;
+   нужно только ввести пароль. Если прервать, запустить снова: `~/.local/bin/atlas-install`.
+4. **Работа.** На последнем шаге скрипт попросит войти в GitHub (код и браузер), потом разложит
+   проекты в `~/Projects`, вернёт память и навыки Claude Code из приватного `claude-memory`
+   и поставит сам Claude Code. Войти в него: `claude` из папки проекта.
+5. **Первый вход.** Откроется «Добро пожаловать»: оформление и приложения (Claude, Discord,
    Telegram, OBS…). Окно можно открыть снова из Компаса.
 
 ## Дальше
@@ -43,20 +42,9 @@
   `atlas-claude install | update | status`.
 - Если Claude показывает чёрное окно — он ждёт KDE Wallet: введите пароль в его запросе.
 
-## Перенести работу
+## Как переносится работа
 
-Код — на GitHub, память Claude Code — в приватном репозитории `claude-memory`
-(в нём `restore.sh`: память кладётся под ключ нового пути проекта).
-
-```bash
-gh auth login
-mkdir -p ~/Projects && cd ~/Projects
-gh repo clone MrPastio/AtlasOS
-gh repo clone MrPastio/claude-memory ~/claude-memory
-~/claude-memory/restore.sh --global
-~/claude-memory/restore.sh E--AtlasOS ~/Projects/AtlasOS
-curl -fsSL https://claude.ai/install.sh | bash
-```
-
-Остальные проекты — так же: `gh repo clone …`, затем `restore.sh <ключ> <папка>`
-(`restore.sh --list` покажет ключи). Claude Code запускается командой `claude` из папки проекта.
+Шаг 4 установки берёт каждый проект из архива памяти (`E--Имя`) и кладёт в `~/Projects/Имя`:
+код клонируется из `MrPastio/Имя`, если такой репозиторий есть, а память — под ключ нового пути.
+Если репозитория нет, ложится только память; код нужно перенести в эту папку вручную.
+Скрипт покажет такие проекты в конце. Запустить этот шаг снова: `~/.local/bin/atlas-install`.

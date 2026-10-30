@@ -13,15 +13,10 @@
 
 ## Перейти на свой образ (с установленного Bazzite)
 
-AMD / Intel / виртуалка:
-
 ```bash
-rpm-ostree rebase ostree-unverified-registry:ghcr.io/mrpastio/atlasos:latest
-systemctl reboot
-rpm-ostree rebase ostree-image-signed:docker://ghcr.io/mrpastio/atlasos:latest
-systemctl reboot
+curl -fsSL https://raw.githubusercontent.com/MrPastio/AtlasOS/main/scripts/install.sh | bash
 ```
 
-NVIDIA: то же самое, но `atlasos-nvidia` вместо `atlasos`.
+Образ под видеокарту выбирается сам. Подробности — в [docs/INSTALL.md](docs/INSTALL.md).
 
 Откат: при загрузке выбрать предыдущую запись в меню, либо `rpm-ostree rollback`.
