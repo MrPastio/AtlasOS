@@ -256,6 +256,7 @@ dnf -yq remove steam lutris bazaar waydroid || :
 
 # Don't check for verified image
 rm -vf /etc/profile.d/verify_motd.sh
+rm -vf /etc/profile.d/user-motd.sh # приветствие Bazzite в Konsole
 
 rm -f /usr/share/applications/bbrew.desktop /usr/share/applications/bazzite-steam*.desktop
 rm -f /usr/bin/rpm-ostree # Should never under any circumstance be ran on the live ISO
