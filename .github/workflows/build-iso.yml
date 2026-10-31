@@ -1,0 +1,79 @@
+name: iso
+# Установочный ISO из готовых образов :latest (их собирает build.yml). Запуск: кнопка «Run workflow»
+# или `gh workflow run iso`; ISO лежит в артефактах запуска 7 дней (`gh run download`).
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - installer/**
+      - .github/workflows/build-iso.yml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-iso:
+    name: Build ISO
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - atlasos        # AMD / Intel / виртуалка
+          - atlasos-nvidia # NVIDIA
+    steps:
+      # Шаги диска и Titanoboa — как в ublue-os/bazzite .github/workflows/build_iso.yml
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6 # v2.0.0
+        with:
+          tool-cache: true
+
+      - name: Mount Container Storage BTRFS Loopback
+        run: |
+          sudo truncate -s 110G /mnt/podman-storage.img
+          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
+          sudo podman system reset --force
+          sudo systemctl stop podman.service
+          LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
+          sudo mkdir -p /mnt/podman-storage
+          sudo mount -o compress-force=zstd:2,discard=async,noatime "$LOOP" /mnt/podman-storage
+          sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
+          sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
+          sudo systemctl start podman.service
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Build live image
+        run: |
+          sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
+            --cap-add sys_admin \
+            --security-opt label=disable \
+            --build-arg BASE_IMAGE=ghcr.io/mrpastio/atlasos:latest \
+            --build-arg INSTALL_IMAGE_PAYLOAD=ghcr.io/mrpastio/${{ matrix.image }}:latest \
+            -t localhost/payload:latest installer/
+
+      - name: Build ISO
+        uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a # revamp-pr
+        id: build
+        with:
+          image-ref: localhost/payload:latest
+          iso-dest: upload/${{ matrix.image }}-live-amd64.iso
+
+      - name: Checksum
+        env:
+          ISO: ${{ steps.build.outputs.iso-dest }}
+        run: |
+          cd "$(dirname "$ISO")"
+          sha256sum "$(basename "$ISO")" | tee "$(basename "$ISO").sha256"
+          ls -l
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ${{ matrix.image }}-iso
+          path: upload
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0

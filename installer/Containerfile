@@ -1,0 +1,16 @@
+# run with --cap-add sys_admin --security-opt label=disable
+
+# BASE_IMAGE — живая среда (всегда atlasos: без проприетарного драйвера NVIDIA),
+# INSTALL_IMAGE_PAYLOAD — образ, который ставится на диск.
+ARG BASE_IMAGE=${BASE_IMAGE:-ghcr.io/mrpastio/atlasos:latest}
+ARG INSTALL_IMAGE_PAYLOAD=${INSTALL_IMAGE_PAYLOAD:-ghcr.io/mrpastio/atlasos:latest}
+
+
+FROM $BASE_IMAGE
+ARG BASE_IMAGE
+ARG INSTALL_IMAGE_PAYLOAD
+RUN --mount=type=bind,source=./.,target=/src \
+    env \
+    BASE_IMAGE="$BASE_IMAGE" \
+    INSTALL_IMAGE_PAYLOAD="$INSTALL_IMAGE_PAYLOAD" \
+    bash /src/build.sh

@@ -1,0 +1,10 @@
+label: "AtlasOS-Live"
+grub2:
+  timeout: 3
+  entries:
+    - name: "Install AtlasOS"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=AtlasOS-Live enforcing=0 rd.live.image"
+      initrd: "/images/pxeboot/initrd.img"
+    - name: "Install AtlasOS (Basic Graphics Mode)"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=AtlasOS-Live enforcing=0 rd.live.image nomodeset"
+      initrd: "/images/pxeboot/initrd.img"
