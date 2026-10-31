@@ -18,6 +18,12 @@ mkdir -p "$(realpath /root)"
 mount -o remount,rw /proc/sys
 
 # Install flatpaks
+# В образах BlueBuild нет временных каталогов, без них ostree падает на open(O_TMPFILE)
+ls -la /var/tmp /var/lib/flatpak /var/lib/flatpak/repo || :
+mkdir -p -m 1777 /var/tmp
+if [[ -d /var/lib/flatpak/repo ]]; then
+    mkdir -p /var/lib/flatpak/repo/tmp/cache
+fi
 curl --retry 3 -Lo /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
 xargs -r flatpak install -y --noninteractive </src/flatpaks
 
