@@ -54,21 +54,20 @@ jobs:
             --build-arg INSTALL_IMAGE_PAYLOAD=ghcr.io/mrpastio/${{ matrix.image }}:latest \
             -t localhost/payload:latest installer/
 
-      - name: Prepare upload directory
-        run: mkdir upload # realpath в Titanoboa требует существующую папку
-
       - name: Build ISO
         uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a # revamp-pr
         id: build
         with:
           image-ref: localhost/payload:latest
-          iso-dest: upload/${{ matrix.image }}-live-amd64.iso
+          iso-dest: ${{ matrix.image }}-live-amd64.iso # только имя: Titanoboa считает путь от своей папки
 
       - name: Checksum
         env:
           ISO: ${{ steps.build.outputs.iso-dest }}
         run: |
-          cd "$(dirname "$ISO")"
+          mkdir upload
+          mv "$ISO" upload/
+          cd upload
           sha256sum "$(basename "$ISO")" | tee "$(basename "$ISO").sha256"
           ls -l
 
